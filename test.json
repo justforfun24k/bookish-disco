@@ -1,0 +1,13 @@
+{
+  "name": "KaiAgent",
+  "memory": [
+    "Agent: 1. [ ] learn ai agents\n2. [ ] build a  app",
+    "User: todo done 1",
+    "Agent: Completed: learn ai agents",
+    "User: run python print(\"Hello from Python!\")",
+    "Agent: Hello from Python!\n",
+    "User: save session to test.json"
+  ],
+  "facts": {},
+  "browse_cache": {}
+}

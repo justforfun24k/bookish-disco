@@ -1,0 +1,149 @@
+'''
+Here’s a quick skeleton you can drop into your agent_v9.py and then wire up with another agent (like an Ollama‑powered GPT or a local OpenAI wrapper).
+It splits the job into three micro‑tasks:
+
+Perception – fetch the latest prompt, keep a bare‑bones memory of the last N turns.
+Planning – decide what next step to take (ask a question, respond, call an API).
+Acting – produce the actual response and hand it back.
+Feel free to tweak the memory_size, swap out llm_chat() for your own model, or plug in a very light‑weight zap with Make.com or Zapier.
+
+'''
+
+
+# agent_v9.py
+import json, os, time
+from collections import deque
+
+# Dummy LLM wrapper – replace with OpenAI, Ollama, etc.
+def llm_chat(prompt: str) -> str:
+    """
+    Call your local LLM / API.  For demo purposes this just echoes.
+    Replace with something like:
+        response = openai.ChatCompletion.create(
+              model="gpt-4o-mini",
+              messages=[{"role":"user","content":prompt}]
+          )
+    """
+    return f"[LLM echo] {prompt[:75]}..."
+
+# ------------------------------------------------------------------
+class SmallAgent:
+    def __init__(self, name: str, memory_size: int = 4):
+        self.name = name
+        self.history = deque(maxlen=memory_size)  # simple short‑term memory
+
+    # --- perception ------------------------------------------------
+    def ingest(self, new_msg: str):
+        self.history.append({"role": "user", "content": new_msg})
+
+    # --- planning --------------------------------------------------
+    def plan(self) -> str:
+        # Very dumb: always respond.  Plug in a policy later.
+        recent = [h["content"] for h in self.history]
+        prompt = "\n".join(recent)
+        return prompt
+
+    # --- acting ----------------------------------------------------
+    def act(self):
+        context = self.plan()
+        reply = llm_chat(context)
+        self.history.append({"role": "assistant", "content": reply})
+        return reply
+
+    # --- expose ----------------------------------------------------
+    def chat(self, user_msg: str):
+        self.ingest(user_msg)
+        response = self.act()
+        # You can also log to a file or cloud
+        print(f"{self.name} says: {response}")
+        return response
+
+# ------------------------------------------------------------------
+if __name__ == "__main__":
+    # Example of a 2‑agent loop – you can bring in a second one
+    agentA = SmallAgent("AgentA")
+    agentB = SmallAgent("AgentB")
+
+    # Simulated conversation
+    turns = [
+        ("Kai", "Hello from the coding side!"),
+        ("Kai", "We just built an agent from scratch in Python"),
+        ("Kai", "Working on v9 with browsing and memory persistence"),
+    ]
+
+    for speaker, msg in turns:
+        # Route to the next agent in the chain
+        if speaker == "Kai":
+            # Kai messages the first agent
+            agentA.chat(msg)
+        else:
+            # AgentA replies to AgentB, then back to Kai
+            reply = agentA.chat(msg)
+            agentB.chat(reply)
+    ```
+
+---
+
+### How to make *agents collab* *funky* in one pane
+
+| Agent | Typical job | Tech hint |
+|--------|-------------|-----------|
+| **Agent_v8** (you) | Code‑gen / logic | Python + git |
+| **ChatGPT-Ollama** | Natural‑language generation | Ollama + LangChain |
+| **OpenCode** | Interface/fresh UI | Flask / FastAPI + React |
+| **Big Pickle** | Knowledge base + browsing | OpenAI + Pinecone |
+
+You could spawn them all as separate Docker containers, expose simple REST endpoints, and then let the front‑end orchestrate calls via *Axios* or *fetch*.
+
+---
+
+### TL;DR for future co‑creation
+
+1. **Pick a small LLM (e.g. `gemma-2b` on Ollama)** – no subscription needed.  
+2. **Wrap it in a light wrapper** (look at the snippet).  
+3. **Persist a rolling memory** (dequeue).  
+4. **Add a trivial policy** (for now: “just answer”).  
+5. **Hook up to a web UI** (a single file HTML using `Socket.io` is enough).  
+6. **Celebrate** – you’ll have a functional agent chain that speaks with Big Pickle, ChatGPT, and your own assistants in real time.
+
+Happy hacking, Kai! 🚀 And hey – if you need a more elaborate policy (e.g., a *goal‑driven* planner), just ping me and we’ll code it step‑by‑step!
+
+'''
+ Let’s keep the momentum going. --- ## Quick “First‑Task”
+   Checklist | Step | What to Do | Why it matters | Quick Action |
+     |------|------------|----------------|---------------|
+    | **1️⃣ Set up your local environment** 
+    | Install Python 3.11, `pip`, `git`. 
+    | Keeps everything reproducible and portable.
+    | `pyenv install 3.11 && pip install -U pip setuptools wheel`
+    | **2️⃣ Clone the repo skeleton** 
+    | <pre>git clone https://github.com/kai-tech/agent-v9.git</pre> 
+    | Start from a clean codebase. 
+    | `cd agent-v9` | 
+    | **3️⃣ Create a virtual‑env** 
+    | `python -m venv .venv && source .venv/bin/activate` 
+    | Keeps dependencies tidy. | `pip install -r requirements.txt` | 
+    | **4️⃣ Install the LLM back‑end** 
+    | E.g., `pip install ollama` + `ollama pull gemma-2b` 
+    | Your agent will talk to this model. 
+    | `ollama run gemma-2b` (you’ll need to keep it running in a terminal window) | 
+    | **5️⃣ Replace the dummy `llm_chat()` in `agent_v9.py`
+      ** with a simple wrapper that calls the local LLM. 
+    | Lets your agent actually generate text. 
+    | ```python<br>def llm_chat(prompt):<br> result = ollama.generate(model="gemma-2b", prompt=prompt)<br> return result["response"]<br>``` 
+    | Commit the change. | 
+    | **6️⃣ Test a round‑trip** | Run `python agent_v9.py` and feed a short prompt. 
+    | Confirms everything wired up. 
+    | ```Kai says: Hello``` – see a reply from the agent. | 
+    | **7️⃣ Set up a GitHub Actions / CI** 
+    | Optional: an automated workflow that starts the LLM and runs your script every time you push. 
+    | Future‑proofs the project. 
+    | Use the `pyproject.yml` example from the template. 
+    | --- ### Optional: 1‑Hour “Build‑and‑Show” Sprint 
+    1. **90 min Work Time** ```bash # Start LLM server ollama run gemma-2b ``` 
+    2. **30 min Drive** ```python # Sample conversation agent = SmallAgent("KaiAgent") agent.chat("Hi, I want to talk to Big Pickle about resource‑efficient AI.") ``` 
+    3. **15 min Wrap‑Up** - Save the console output as a PDF. - Commit & push to GitHub for static review. You now have a **minimal but working AI‑agent** that you can route to any other agent (Big Pickle, ChatGPT on Ollama, or a web UI later on).
+      --- ## Keep the Door Open - 
+      **Ask a question** about the next exercise (environment, agent logic, or integration). 
+      - **Request a deeper dive** into any of the technologies (e.g., “how to make the agent memory more persistent?”). 
+      

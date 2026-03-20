@@ -1,0 +1,24 @@
+Multi-agent collaboration means multiple agents working together. 
+
+Simple approach:
+Agent A delegates tasks to Agent B
+Two agents chat with each other
+Specialist agents (searcher, coder, writer)
+
+Architecture:
+User → Planner Agent → Specialist Agents → Results
+              ↓
+         Researcher → searches web
+         Coder → writes code  
+         Writer → creates content
+
+
+a simple multi-agent system where:
+A main agent can spawn/use other specialist agents
+Agents can communicate/collaborate
+
+a simpler version:
+Two agents that can chat with each other
+Agent A asks Agent B to help with tasks
+
+

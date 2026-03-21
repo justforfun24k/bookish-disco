@@ -18,6 +18,9 @@ jobs:
         with:
           python-version: '3.10'
       
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      
       - name: Test agent imports
         run: python -c "from opencode_agent import read, write, edit, bash; print('OK')"
       

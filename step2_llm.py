@@ -82,7 +82,7 @@ def call_llm(messages, model="llama3.2:3b"):
                 "messages": messages,
                 "stream": False,
             },
-            timeout=60
+            timeout=150
         )
         if response.status_code == 200:
             return response.json()["message"]["content"]
@@ -104,7 +104,12 @@ Guidelines:
 - Use read before editing files
 - Use edit for precise changes
 - Use write for new files
-- Use bash for commands (ls, grep, find)
+- Use bash for commands (ls, grep, find etc)
+- Always return JSON for tool calls,for example:
+    <tool>{
+        "tool": "bash",
+        "args": {...}
+    }</tool>
 - Be concise in responses"""
 
 # =============================================

@@ -224,9 +224,11 @@ class PiAgent:
             args=tool_call.get('args',{})
             result=execute_tool(tool_name,args)
             self.messages.append({"role": "assistant","content": f"{response}"})
+            # Might need to convert dict to string properly:
+            tool_output = str(result) if isinstance(result, dict) else result
             self.messages.append({
-                "role": "user",
-                "content": f"<tool_result>{result}</tool_result>"
+                "role": "user", 
+                "content": f"<tool_result>{tool_output}</tool_result>"
             })
             response=call_llm(self.messages,self.model)
         except Exception as e:

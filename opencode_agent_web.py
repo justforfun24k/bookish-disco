@@ -4,7 +4,7 @@ opencode_agent_web.py - Web UI for Pi-Style Agent
 A simple web interface to chat with the agent.
 """
 from flask import Flask, render_template_string, request, jsonify
-from opencode_agent import PiAgent, Session
+from opencode_agent import PiAgent
 
 app = Flask(__name__)
 

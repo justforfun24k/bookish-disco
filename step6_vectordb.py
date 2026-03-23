@@ -165,7 +165,8 @@ class VectorMemory:
         # This is a VERY simple embedding - just character frequency
         # For real use, integrate with OpenAI embeddings or local model
         import hashlib
-        # Create a pseudo-embedding from text hash
+        # Create a pseudo-embedding from text hash,
+        # like an algorithm of encryption/decryption or compression/decompression?
         embedding = [0] * 10
         for i, char in enumerate(text[:10]):
             embedding[i % 10] += ord(char)
@@ -239,7 +240,7 @@ You have long-term memory (vector database). When user asks about past topics, s
         self.messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     
     def chat(self, user_input):
-        # Check vector memory for relevant past conversations
+        # Check vector memory for relevant past conversations,if not None append to the system message
         if any(word in user_input.lower() for word in ["remember", "past", "before", "learned", "discussed"]):
             past_memories = self.vector_memory.search(user_input, n_results=3)
             if past_memories:
